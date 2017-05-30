@@ -37,8 +37,8 @@
   {
     // preg_match_all('/<body.*>(.*?)<\/body>/s', $pageContent, $matches);
     // $bodyContent = $matches[0];
-    // $withoutScripts = preg_replace("/<script[\s\S]*>[\s\S]*?<\/script>/", "", $bodyContent[0]);
-    $bodyContent = preg_replace("/<.*?>/u", "", $pageContent);
+    $bodyContent = preg_replace("/<script[\s\S]*>[\s\S]*?<\/script>/u", "", $pageContent);
+    $bodyContent = preg_replace("/<.*?>/u", "", $bodyContent);
     $bodyContent = preg_replace('/[^\p{L}\s\d]/u', '', $bodyContent);
     return $bodyContent;
   }
@@ -85,8 +85,12 @@
       if (count($splitted) > 1 && strlen($splitted[1]) && !in_array($splitted[1], $supportedTypes)) {
         return NULL;
       }
+
+      if ($path[0] != '/' && $path[0] != '\.') {
+        $path = explode("/", substr($sourceUrl["path"], 1), 2)[0] . '/' . $path;
+      }
     }
 
-    return $scheme . '://' . $host . $path;
+    return $scheme . '://' . $host . '/' . $path;
   }
 ?>

@@ -4,7 +4,7 @@
 
 function db_connect()
 {
-    $server_name = "localhost";
+    $server_name = "progiot.ddns.net:3306";
     $username = "greenflame";
     $password = "qwerty123";
     $db_name = "moustached_search";
@@ -39,7 +39,6 @@ function db_check_if_document_exists($conn, $url)
 
 function db_insert_document($conn, $url, $text)
 {
-    $text = mysql_real_escape_string($text);
     $sql = "INSERT INTO `Document` (`url`, `content`) VALUES ('{$url}', '{$text}');";
     if ($conn->query($sql) !== TRUE) {
         throw new Exception('Error: ' . $conn->error);
@@ -65,7 +64,6 @@ function db_perform_search($conn, $query)
             `term` REGEXP '^({$terms}).*$' GROUP BY `document_id`) AS `Rank` JOIN `Document` ON
             `Document`.`id` = `Rank`.`document_id` ORDER BY `score` DESC;";
     $result = $conn->query($sql);
-    var_dump($result);
     $ret = [];
     while ($row = $result->fetch_assoc()) {
         array_push($ret, $row);
