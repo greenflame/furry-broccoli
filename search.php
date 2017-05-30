@@ -38,6 +38,9 @@
   else if ($requestType == 'clear') {
     db_truncate($conn);
   }
+  else if ($requestType == 'storage') {
+    echo json_encode(db_get_documents($conn));
+  }
 
   db_close($conn);
 
@@ -97,4 +100,3 @@
 
     return $scheme . '://' . $host . $path;
   }
-?>

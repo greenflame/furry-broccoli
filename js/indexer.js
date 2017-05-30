@@ -15,14 +15,6 @@
     indexLink();
   });
 
-  $('.clear-button').on('click', function(e) {
-    $.ajax({
-      url: "search.php?type=clear"
-    }).done(function() {
-      alert('cleared');
-    });
-  });
-
   function indexLink() {
     showLinks();
 
@@ -66,7 +58,6 @@
       }
 
       showLinks();
-
       indexLink();
     });
   }
@@ -76,14 +67,16 @@
 
     for (var i = 0; i < links.length; i++) {
       linksHtml += '<li><a href="' + links[i].url + '">' + links[i].url + '</a>' +
-                      (links[i].isReady ? 'Ok' : 'In progress') +
-                    '</li>';
+          (links[i].isReady ? 'Ok' : 'In progress') + '</li>';
     }
 
     $('.links-section > ol').html(linksHtml);
+
+    var finished_count = links.filter(function(link) {
+        return link.isReady;
+    }).length;
+
+    $('.info').html('Total documents in queue: ' + links.length + ', finished: ' + finished_count);
   }
 
-  function showAlreadyIndexed() {
-    alert('Already indexed!');
-  }
 })();

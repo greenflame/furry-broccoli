@@ -47,6 +47,17 @@ function db_insert_document($conn, $url, $text)
     return $conn->insert_id;
 }
 
+function db_get_documents($conn) {
+    $sql = "SELECT * FROM Document ORDER BY `url` DESC;";
+    $result = $conn->query($sql);
+    $ret = [];
+    while ($row = $result->fetch_assoc()) {
+        array_push($ret, $row);
+    }
+
+    return $ret;
+}
+
 function db_insert_entry($conn, $doc_id, $term, $count)
 {
     $sql = "INSERT INTO `Entry` (`document_id`, `term`, `count`) VALUES ({$doc_id}, '{$term}', {$count});";
