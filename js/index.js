@@ -22,5 +22,6 @@
     }
 
     $('.result-section').html(resultsHtml);
+    $('.info').html('Результатов поиска: ' + results.length);
   }
 })();
