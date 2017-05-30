@@ -49,19 +49,19 @@ body {
     background-color: #fff
 }
 
-.search-section {
+.search-section, .indexer-section {
     padding-top: 20px;
     display: inline-block;
 }
 
-.search-input {
+.search-input, .indexer-input {
     width: 300px;
     height: 30px;
 }
 
-.search-button {
+.search-button, .indexer-button, .clear-button {
     height: 35px;
-    width: 100px;
+    /*width: 100px;*/
     margin-top: -2px;
 }
 

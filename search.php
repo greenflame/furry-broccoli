@@ -1,6 +1,8 @@
 <?php
   include 'search_engine.php';
 
+  error_reporting(E_ERROR);
+
   $conn = db_connect();
 
   $requestType = $_GET['type'];
@@ -9,7 +11,13 @@
     $linkToIndex = $_GET['link'];
 
     if (strlen($linkToIndex) > 0) {
-      $pageContent = file_get_contents($linkToIndex);
+      $ctx = stream_context_create(array('http'=>
+          array(
+              'timeout' => 10,
+          )
+      ));
+
+      $pageContent = file_get_contents($linkToIndex, false, $ctx);
       $text = parsePageContent($pageContent);
       $subLinks = getSubLinks($pageContent, $linkToIndex);
 

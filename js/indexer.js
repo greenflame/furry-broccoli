@@ -47,26 +47,22 @@
 
       var linksJson = $.parseJSON(newLinks);
 
-      if (!newLinks || linksJson.length === 0) {
-        return;
-      }
+      if (newLinks && linksJson.length !== 0) {
+          if (currentLink.level !== maxLevel) {
+              for (var i = 0; i < linksJson.length; i++) {
+                  var filterContains = function(link) {
+                      return link.url === linksJson[i];
+                  };
 
-      if (currentLink.level >= maxLevel) {
-        return;
-      }
-
-      for (var i = 0; i < linksJson.length; i++) {
-        var filterContains = function(link) {
-          return link.url === linksJson[i];
-        };
-
-        if (links.filter(filterContains).length === 0) {
-          links.push({
-            url: linksJson[i],
-            isReady: false,
-            level: currentLink.level + 1
-          });
-        }
+                  if (links.filter(filterContains).length === 0) {
+                      links.push({
+                          url: linksJson[i],
+                          isReady: false,
+                          level: currentLink.level + 1
+                      });
+                  }
+              }
+          }
       }
 
       showLinks();
