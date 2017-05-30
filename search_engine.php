@@ -4,7 +4,7 @@
 
 function db_connect()
 {
-    $server_name = "progiot.ddns.net:3306";
+    $server_name = "localhost";
     $username = "greenflame";
     $password = "qwerty123";
     $db_name = "moustached_search";
@@ -65,6 +65,7 @@ function db_perform_search($conn, $query)
             `term` REGEXP '^({$terms}).*$' GROUP BY `document_id`) AS `Rank` JOIN `Document` ON
             `Document`.`id` = `Rank`.`document_id` ORDER BY `score` DESC;";
     $result = $conn->query($sql);
+    var_dump($result);
     $ret = [];
     while ($row = $result->fetch_assoc()) {
         array_push($ret, $row);

@@ -16,7 +16,7 @@
       try {
         engine_consume($conn, $linkToIndex, $text);
       } catch (Exception $e) {
-        die($e);
+
       }
 
       echo json_encode($subLinks);
@@ -31,13 +31,16 @@
     db_truncate($conn);
   }
 
+  db_close($conn);
+
   function parsePageContent($pageContent)
   {
     // preg_match_all('/<body.*>(.*?)<\/body>/s', $pageContent, $matches);
     // $bodyContent = $matches[0];
     // $withoutScripts = preg_replace("/<script[\s\S]*>[\s\S]*?<\/script>/", "", $bodyContent[0]);
-    $bodyContent = preg_replace('/[^\p{L}\s\d]/u', '', $pageContent);
-    return preg_replace("/<.*?>/", "", $bodyContent);
+    $bodyContent = preg_replace("/<.*?>/u", "", $pageContent);
+    $bodyContent = preg_replace('/[^\p{L}\s\d]/u', '', $bodyContent);
+    return $bodyContent;
   }
 
   function getSubLinks($pageContent, $sourceLink)
@@ -50,7 +53,7 @@
       $parsedUrl = parse_url($matches[1][$i]);
       $repairedUrl = repairUrl($parsedUrl, parse_url($sourceLink));
 
-      if ($repairedUrl != NULL) {
+      if ($repairedUrl != NULL && !in_array($repairedUrl, $subLinks)) {
         array_push($subLinks, $repairedUrl);
       }
     }
