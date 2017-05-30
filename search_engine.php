@@ -59,9 +59,9 @@ function db_insert_entry($conn, $doc_id, $term, $count)
 
 function db_perform_search($conn, $query)
 {
-    $terms = join("', '", smart_split($query));
-    $sql = "SELECT * FROM (SELECT `document_id`, SUM(`count`) + COUNT(*) * 1000 AS `score` FROM `Entry`WHERE
-            `term` IN ('{$terms}') GROUP BY `document_id`) AS `Rank` JOIN `Document` ON
+    $terms = join("|", smart_split($query));
+    $sql = "SELECT * FROM (SELECT `document_id`, SUM(`count`) + COUNT(*) * 1000 AS `score` FROM `Entry` WHERE
+            `term` REGEXP '^({$terms}).*$' GROUP BY `document_id`) AS `Rank` JOIN `Document` ON
             `Document`.`id` = `Rank`.`document_id` ORDER BY `score` DESC;";
     $result = $conn->query($sql);
     $ret = [];
@@ -91,8 +91,10 @@ function group_by_occurrences($arr)
 
 function smart_split($str)
 {
+    $str = preg_replace('/[^\p{L}\s\d]/u', '', $str);
     $arr = mb_strtolower($str, 'utf-8');
-    return preg_split("#[^\p{L}]+#u", $arr, -1, PREG_SPLIT_NO_EMPTY);
+    $ret = preg_split("/[\s]+/u", $arr, -1, PREG_SPLIT_NO_EMPTY);
+    return $ret;
 }
 
 function count_terms($text)
@@ -115,7 +117,7 @@ function engine_consume($conn, $url, $text)
         }
 
         catch(Exception $e) {
-//            echo "Can't insert entry: {$term}. {$e->getMessage() }<br />";
+            echo "Can't insert entry: {$term}. {$e->getMessage() }<br />";
         }
     }
 }
