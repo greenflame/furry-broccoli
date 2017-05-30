@@ -1,6 +1,8 @@
 <?php
   include 'search_engine.php';
 
+  error_reporting(E_ERROR);
+
   $conn = db_connect();
 
   $requestType = $_GET['type'];
@@ -9,7 +11,13 @@
     $linkToIndex = $_GET['link'];
 
     if (strlen($linkToIndex) > 0) {
-      $pageContent = file_get_contents($linkToIndex);
+      $ctx = stream_context_create(array('http'=>
+          array(
+              'timeout' => 10,
+          )
+      ));
+
+      $pageContent = file_get_contents($linkToIndex, false, $ctx);
       $text = parsePageContent($pageContent);
       $subLinks = getSubLinks($pageContent, $linkToIndex);
 
@@ -30,14 +38,18 @@
   else if ($requestType == 'clear') {
     db_truncate($conn);
   }
+  else if ($requestType == 'storage') {
+    echo json_encode(db_get_documents($conn));
+  }
 
   db_close($conn);
 
   function parsePageContent($pageContent)
   {
-    // preg_match_all('/<body.*>(.*?)<\/body>/s', $pageContent, $matches);
-    // $bodyContent = $matches[0];
-    $bodyContent = preg_replace("/<script[\s\S]*>[\s\S]*?<\/script>/u", "", $pageContent);
+    preg_match_all('/<body.*>(.*?)<\/body>/su', $pageContent, $matches);
+    $bodyContent = $matches[0][0];
+    $bodyContent = preg_replace("/<script[\s\S]*>[\s\S]*<\/script>/suiU", "", $bodyContent);
+    $bodyContent = preg_replace("/<style[\s\S]*>[\s\S]*<\/style>/suiU", "", $bodyContent);
     $bodyContent = preg_replace("/<.*?>/u", "", $bodyContent);
     $bodyContent = preg_replace('/[^\p{L}\s\d]/u', '', $bodyContent);
     return $bodyContent;
@@ -45,7 +57,7 @@
 
   function getSubLinks($pageContent, $sourceLink)
   {
-    preg_match_all('/<a href="(.*?)">/s', $pageContent, $matches);
+    preg_match_all('/<a href="(.*?)"\s/s', $pageContent, $matches);
 
     $subLinks = array();
 
@@ -93,4 +105,3 @@
 
     return $scheme . '://' . $host . '/' . $path;
   }
-?>

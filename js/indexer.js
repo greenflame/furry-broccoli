@@ -15,14 +15,6 @@
     indexLink();
   });
 
-  $('.clear-button').on('click', function(e) {
-    $.ajax({
-      url: "search.php?type=clear"
-    }).done(function() {
-      alert('cleared');
-    });
-  });
-
   function indexLink() {
     showLinks();
 
@@ -47,30 +39,25 @@
 
       var linksJson = $.parseJSON(newLinks);
 
-      if (!newLinks || linksJson.length === 0) {
-        return;
-      }
+      if (newLinks && linksJson.length !== 0) {
+          if (currentLink.level !== maxLevel) {
+              for (var i = 0; i < linksJson.length; i++) {
+                  var filterContains = function(link) {
+                      return link.url === linksJson[i];
+                  };
 
-      if (currentLink.level >= maxLevel) {
-        return;
-      }
-
-      for (var i = 0; i < linksJson.length; i++) {
-        var filterContains = function(link) {
-          return link.url === linksJson[i];
-        };
-
-        if (links.filter(filterContains).length === 0) {
-          links.push({
-            url: linksJson[i],
-            isReady: false,
-            level: currentLink.level + 1
-          });
-        }
+                  if (links.filter(filterContains).length === 0) {
+                      links.push({
+                          url: linksJson[i],
+                          isReady: false,
+                          level: currentLink.level + 1
+                      });
+                  }
+              }
+          }
       }
 
       showLinks();
-
       indexLink();
     });
   }
@@ -80,14 +67,16 @@
 
     for (var i = 0; i < links.length; i++) {
       linksHtml += '<li><a href="' + links[i].url + '">' + links[i].url + '</a>' +
-                      (links[i].isReady ? 'Ok' : 'In progress') +
-                    '</li>';
+          (links[i].isReady ? 'Ok' : 'In progress') + '</li>';
     }
 
     $('.links-section > ol').html(linksHtml);
+
+    var finished_count = links.filter(function(link) {
+        return link.isReady;
+    }).length;
+
+    $('.info').html('Total documents in queue: ' + links.length + ', finished: ' + finished_count);
   }
 
-  function showAlreadyIndexed() {
-    alert('Already indexed!');
-  }
 })();
