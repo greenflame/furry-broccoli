@@ -5,6 +5,7 @@
 function db_connect()
 {
     $server_name = "127.0.0.1:3306";    // progiot.ddns.net:3306
+//    $server_name = "progiot.ddns.net:3306";
     $username = "greenflame";
     $password = "qwerty123";
     $db_name = "moustached_search";
@@ -70,9 +71,21 @@ function db_insert_entry($conn, $doc_id, $term, $count)
 
 function db_perform_search($conn, $query)
 {
-    $terms = join("|", smart_split($query));
+    $extended_search = true;
+
+    $query_terms = smart_split($query);
+
+    if ($extended_search) {
+        $core = join("|", $query_terms);
+        $construct = "REGEXP '^({$core}).*$'";
+    }
+    else {
+        $core = join("', '", $query_terms);
+        $construct = "IN ('{$core}')";
+    }
+
     $sql = "SELECT * FROM (SELECT `document_id`, SUM(`count`) + COUNT(*) * 1000 AS `score` FROM `Entry` WHERE
-            `term` REGEXP '^({$terms}).*$' GROUP BY `document_id`) AS `Rank` JOIN `Document` ON
+            `term` {$construct} GROUP BY `document_id`) AS `Rank` JOIN `Document` ON
             `Document`.`id` = `Rank`.`document_id` ORDER BY `score` DESC;";
     $result = $conn->query($sql);
     $ret = [];

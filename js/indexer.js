@@ -67,7 +67,7 @@
 
     for (var i = 0; i < links.length; i++) {
       linksHtml += '<li><a href="' + links[i].url + '">' + links[i].url + '</a>' +
-          (links[i].isReady ? 'Ok' : 'In progress') + '</li>';
+          (links[i].isReady ? ' [Ok]' : ' [In queue]') + '</li>';
     }
 
     $('.links-section > ol').html(linksHtml);
