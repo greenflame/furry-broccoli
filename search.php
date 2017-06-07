@@ -57,7 +57,7 @@
 
   function getSubLinks($pageContent, $sourceLink)
   {
-    preg_match_all('/<a href="(.*?)"\s/s', $pageContent, $matches);
+    preg_match_all('/<a href="(.*?)"[>\s]/s', $pageContent, $matches);
 
     $subLinks = array();
 
@@ -99,7 +99,16 @@
       }
 
       if ($path[0] != '/' && $path[0] != '\.') {
-        $path = explode("/", substr($sourceUrl["path"], 1), 2)[0] . '/' . $path;
+        $path_spl = split("/", substr($sourceUrl["path"], 1));
+		$pl = array_slice($path_spl, 0, -1);
+		$pr = split("/", $path);
+		
+		while ($pr[0] == '..') {
+			$pl = array_slice($pl, 0, -1);
+			$pr = array_slice($pr, 1);
+		}
+		
+		$path = implode("/", $pl) . '/' . implode("/", $pr);
       }
     }
 
